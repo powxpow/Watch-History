@@ -27,3 +27,7 @@ We’re committed to enhancing your experience:
   **User-Driven Features:** We welcome your suggestions for additional features!
 
 Remember: You can do it! Take control of your data and explore your YouTube journey.
+
+## Notes From the Author
+
+I was intending to use YouTube's API for the data, but Google [removed the API access](https://developers.google.com/youtube/v3/revision_history#august-11,-2016) to YouTube Watch History in 2016. Therefore, the program processes the Watch History file you can get from Google Takeout instead. The code handles the Takeout ZIP file as well as the "Watch History" JSON and the HTML versions. This program is in early development, with documentation and better error handling coming soon.
