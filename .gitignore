@@ -52,7 +52,7 @@ coverage.xml
 cover/
 
 # test data
-tests/data
+tests/data/
 
 # Translations
 *.mo
