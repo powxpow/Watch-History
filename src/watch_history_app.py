@@ -1,9 +1,12 @@
 '''watch_history_app'''
+#core
 import logging
 import os
 import platform
 import sys
 from pathlib import Path, PurePath
+#modules
+# pylint: disable=no-name-in-module
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtWidgets import (
     QApplication,
@@ -14,7 +17,12 @@ from PySide6.QtWidgets import (
     QLabel,
     QPlainTextEdit,
     QPushButton )
-from watch_history_core import WatchHistory, Feedback
+#classes
+from classes.signalhook import SignalHook
+# pylint: disable=import-error
+from classes.whrun import WatchHistoryRun
+from classes.whdata import WatchHistoryDataHandler as whdh
+from classes.whexcel import ExcelBuilder as excel
 
 class ProcessHistoryThread(QThread):
     '''ProcessHistoryThread'''
@@ -33,8 +41,8 @@ class ProcessHistoryThread(QThread):
 
     def run(self):
         '''run'''
-        watch_history = WatchHistory(self.feedback)
-        watch_history.process_yt_history(self.source_file, self.dest_file)
+        watch_history = WatchHistoryRun(self.feedback, whdh(), spreadsheet=excel())
+        watch_history.run(self.source_file, self.dest_file)
 
 class WatchHistoryApp(QMainWindow):
     '''WatchHistoryApp'''
@@ -43,7 +51,7 @@ class WatchHistoryApp(QMainWindow):
     dest_file = None
     run_thread = None
     #Keep the feedback object around so we don't reinitialize and get double messages
-    run_feedback = Feedback(stream=sys.stdout)
+    run_feedback = SignalHook(stream=sys.stdout)
 
     def __init__(self):
         super().__init__()
@@ -55,7 +63,7 @@ class WatchHistoryApp(QMainWindow):
         self.style_path_set =  "border: 1px solid lime; border-radius: 6px;"
         self.style_run_ready = "background-color: green; color: white;"
         self.style_console = "background-color: black; color: lightgreen;"
-        self.style_console += "font-family: 'Cascadia Code', monospace;"
+        self.style_console += 'font-family: monospace;'
         self.style_console += "border: 1px solid white; border-radius: 6px;margin-left: 2px"
 
         # Create widgets
