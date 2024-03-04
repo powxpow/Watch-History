@@ -35,9 +35,13 @@ class ViewRecord:
     view: datetime
 
 class WatchHistoryDataHandler():
-    '''WatchHistoryDataHandler'''
+    '''
+    WatchHistoryDataHandler
+    '''
     def create_views_df_from_source(self, source_file):
-        '''create_views_df_from_source'''
+        '''
+        create_views_df_from_source
+        '''
         views_df = None
         src = Path(source_file)
 
@@ -74,7 +78,9 @@ class WatchHistoryDataHandler():
 
     @staticmethod
     def create_views_df_json(data):
-        '''create_views_df_json'''
+        '''
+        create_views_df_json
+        '''
         views_df = None
         total = len(data)
         views = []
@@ -115,17 +121,19 @@ class WatchHistoryDataHandler():
 
     #div.outer-cell
     #   div.mdl-grid
-    #       header-cell: p "YouTube"
+    #       header-cell: p ("YouTube","YouTube Music", ...)
     #       content-cell
     #           0 a=survey, 1 a=ad, 2 a=video
     #       content-cell - (no data) and class ends with "mdl-typography--text-right"
     #       content-cell
-    #           b "Products" (followed by "YouTube","YouTube Music")
+    #           b "Products" (followed by "YouTube")
     #           optional b "Details" followed by "From Google Ads" (ads and surveys)
     #           b "Why is this here?" followed by explanation and 1 a link
     @staticmethod
     def create_views_df_html(doc):
-        '''create_views_df_html'''
+        '''
+        create_views_df_html
+        '''
         views_df = None
         views = []
         idx = 0
@@ -166,7 +174,12 @@ class WatchHistoryDataHandler():
 
     @staticmethod
     def create_videos_df(views_df):
-        '''create_videos_df'''
+        '''
+        Create Videos DataFrame from Views DataFrame.
+        Grab the Channel and Videos columns, drop duplicates.
+        Then count the number views and and add the count as a column.
+
+        '''
         videos_df = DataFrame(
             views_df,
             columns=['channel_id', 'channel_title', 'channel_url',
@@ -180,7 +193,12 @@ class WatchHistoryDataHandler():
 
     @staticmethod
     def create_channels_df(videos_df):
-        '''create_channels_df'''
+        '''
+        Create Channels DataFrame from Videos DataFrame.
+        Grab the Channel columns, drop duplicates.
+        Then count the number videos and and add the count as a column.
+
+        '''
         channels_df = DataFrame(
             videos_df,
             columns=['channel_id', 'channel_title', 'channel_url']).drop_duplicates()

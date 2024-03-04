@@ -129,7 +129,9 @@ class WatchHistoryApp(QMainWindow):
             self.dest_path_label.setStyleSheet(self.style_path_set)
 
     def open_destination_folder(self):
-        '''open_destination_folder'''
+        '''
+        open_destination_folder
+        '''
         cmd = 'open'
         match platform.system():
             case 'Windows':

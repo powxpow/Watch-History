@@ -14,9 +14,11 @@ from classes.whexcel import ExcelBuilder as excel
 
 @staticmethod
 def get_parameters():
-    '''Attempt to get the Google Takeout fille and the Output directory. 
-       If the user has provided command line arguments, use that.
-       Otherwise ask the user for them.'''
+    '''
+    Attempt to get the Google Takeout fille and the Output directory. 
+    If the user has provided command line arguments, use that.
+    Otherwise ask the user for them.
+    '''
     args = get_args()
     source_prompt = "Enter Google Takeout file path"
     src_default = "tests/data/good-sample-j.json"
@@ -27,8 +29,10 @@ def get_parameters():
 
 @staticmethod
 def get_args():
-    '''Attempt to get the Google Takeout file and output directory from
-       command line arguments'''
+    '''
+    Attempt to get the Google Takeout file and output directory from
+    command line arguments
+    '''
     desc = "Process Google Takeout file and output spreadsheet to directory."
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("source_file", nargs="?", help="Google Takeout file")
