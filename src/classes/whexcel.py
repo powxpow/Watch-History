@@ -18,8 +18,25 @@ class ExcelBuilder():
     '''ExcelBuilder'''
 
     @staticmethod
+    def clean_data_for_report(channels_df, videos_df, views_df):
+        '''
+        Cleans the DataFrames for the report by returning a new DataFrames 
+        that only include needed columns for reporting. For example: 
+        video_id and channel_id are not included for the end user's spreadsheet.
+        '''
+        ch_df = DataFrame(channels_df, columns=['channel_title', 'channel_url', 'videos'])
+        vd_df = DataFrame(videos_df,
+            columns=['channel_title', 'channel_url', 'video_title', 'video_url', 'views'])
+        vw_df = DataFrame(views_df, columns=['video_title', 'video_url', 'view'])
+        return (ch_df, vd_df, vw_df)
+
+    @staticmethod
     def create_hyperlinks(a_df):
-        '''create_hyperlinks'''
+        '''
+        Searches by column names to see if it can create a Hyperlink object for
+        channels and videos. This Hyperlink object then can be turned into a 
+        clickable hyperlink on the Excel spreadsheet when it is rendered.
+        '''
         if 'channel_url' in a_df.columns and 'channel_title' in a_df.columns:
             idx = a_df.columns.get_loc("channel_title")
             a_df.insert(idx, "Channel",
@@ -36,12 +53,10 @@ class ExcelBuilder():
 
     def export_spreadsheet(self, channels_df, videos_df, views_df, filename):
         '''export_spreadsheet'''
-        ch_df = self.create_hyperlinks(DataFrame(channels_df,
-            columns=['channel_title', 'channel_url', 'videos']))
-        vd_df = self.create_hyperlinks(DataFrame(videos_df,
-            columns=['channel_title', 'channel_url', 'video_title', 'video_url', 'views']))
-        vw_df = self.create_hyperlinks(DataFrame(views_df,
-            columns=['video_title', 'video_url', 'view']))
+        ch_df, vd_df, vw_df = self.clean_data_for_report(channels_df, videos_df, views_df)
+        ch_df = self.create_hyperlinks(ch_df)
+        vd_df = self.create_hyperlinks(vd_df)
+        vw_df = self.create_hyperlinks(vw_df)
         channel_widths = [45, 6]
         video_widths = [45, 45, 6]
         views_widths = [45, 19]
@@ -57,7 +72,7 @@ class ExcelBuilder():
         #book settings
         writer.book.remove_timezone = True
         bolded = writer.book.add_format({"bold": True})
-        vw_fmt = writer.book.add_format({'num_format': 'dd/mm/yyyy hh:mm AM/PM'})
+        vw_fmt = writer.book.add_format({'num_format': 'yyyy-MM-dd hh:mm AM/PM'})
 
         #get sheet by sheet_name
         sheet = None
