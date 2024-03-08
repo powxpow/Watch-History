@@ -6,7 +6,7 @@
    Spreadsheet Renderer (currently only whexcel) to create the spreadsheet.'''
 #core
 import logging as log
-from pathlib import Path
+from pathlib import Path, PurePath
 #modules
 from pandas import DataFrame
 
@@ -33,17 +33,34 @@ class WatchHistoryRun():
                     log.error("%s is not a file", source_file)
                 else:
                     src = spath
-                    log.info("Found '%s'", src.name)
             else:
                 log.error("Unable to locate '%s'", source_file)
         return src
 
+    @staticmethod
+    def is_good_path(a_path):
+        '''is_good_path'''
+        is_good = False
+        fpath = a_path
+        if isinstance(a_path, str) or isinstance(a_path, PurePath):
+            fpath = Path(a_path)
+        if isinstance(fpath, Path):
+            f_dir = Path(fpath.parents[0].expanduser())
+            if f_dir.exists():
+                is_good = True
+            else:
+                log.error("Unable to find the folder for '%s'", a_path)
+        return is_good
+
     def run(self, source_file, dest_file):
         '''run'''
         src = self.get_source_path(source_file)
-        if src is not None:
+        is_good_dest = self.is_good_path(dest_file)
+        if src is not None and is_good_dest:
+            log.info("Found '%s'", src.name)
             wh = self.whdf
             views_df = wh.create_views_df_from_source(src)
+
             channels_df= None
             videos_df = None
             if views_df is not None:
