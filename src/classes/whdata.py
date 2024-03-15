@@ -17,7 +17,7 @@ from zipfile import ZipFile
 #modules
 from dateutil import tz, parser as dateutil_parser
 from htmlement import parse as html_parse
-from pandas import DataFrame
+from pandas import DataFrame, to_datetime
 
 @dataclass
 class ViewRecord:
@@ -103,7 +103,7 @@ class WatchHistoryDataHandler():
                     video_title=rec.get('title').replace('Watched ',''),
                     video_url=vd_url,
                     video_id=vd_id,
-                    view=dateutil_parser.isoparse(rec.pop('time')).astimezone(None)
+                    view=dateutil_parser.isoparse(rec.pop('time'))
                 )
                 views.append(view_record)
             else:
@@ -111,6 +111,8 @@ class WatchHistoryDataHandler():
 
         if len(views) > 0:
             views_df = DataFrame(views)
+            views_df['view'] = to_datetime(views_df['view'], utc=True)
+
             log.info('%7d total records processed', total)
             log.info('%7d ads ignored, %d were surveys',
                 total - views_df.shape[0], survey_count)
