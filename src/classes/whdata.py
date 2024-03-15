@@ -173,7 +173,7 @@ class WatchHistoryDataHandler():
 
         if len(views) > 0:
             views_df = DataFrame(views)
-            #standardize datetime - more testing needed
+
             views_df['view'] = to_datetime(views_df['view'], utc=True)
             log.info('%7d total records processed', idx)
             log.info('%7d ads ignored', idx - views_df.shape[0])
