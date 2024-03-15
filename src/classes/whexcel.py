@@ -4,10 +4,12 @@ from dataclasses import dataclass
 import logging as log
 import os
 #modules
+from numpy.dtypes import DateTime64DType
 from pandas import DataFrame, ExcelWriter, Timestamp
 from pandas.core.dtypes.dtypes import DatetimeTZDtype
 from tzlocal import get_localzone
 from xlsxwriter import __name__ as XLSXWRITER
+from xlsxwriter.utility import xl_col_to_name
 
 @dataclass
 class Hyperlink:
@@ -51,18 +53,50 @@ class ExcelBuilder():
             a_df.drop(columns=[title_col, url_col], inplace=True)
         return a_df
 
-    def export_spreadsheet(self, channels_df, videos_df, views_df, filename):
+    def export_spreadsheet(self, filename, dfs):
         '''export_spreadsheet'''
-        ch_df, vd_df, vw_df = self.clean_data_for_report(channels_df, videos_df, views_df)
+        ch_df, vd_df, vw_df = self.clean_data_for_report(
+            dfs['channels_df'], dfs['videos_df'], dfs['views_df'])
+        mv_df = dfs['monthlyviews_df']
         channel_widths = [45, 6]
         video_widths = [45, 45, 6]
         views_widths = [45, 19]
+        mviews_widths = [8, 6]
         with ExcelWriter(f"{filename}", engine=XLSXWRITER) as writer: # pylint: disable=abstract-class-instantiated
             self.export_sheet(writer.book, 'Channels', channel_widths, ch_df)
             self.export_sheet(writer.book, 'Videos', video_widths, vd_df)
             self.export_sheet(writer.book, 'Views', views_widths, vw_df)
+            self.export_sheet(writer.book, "Monthly", mviews_widths, mv_df)
+            self.add_graph(writer.book, "Monthly", mv_df)
             home =os.path.expanduser('~')
             log.info('Exported %s', str(filename).replace(home,"~"))
+
+    def add_graph(self, book, sheet_name, a_df):
+        '''
+        Adds a graph to a sheet.
+        '''
+        #get sheet by sheet_name
+        sheet = None
+        if sheet_name in book.sheetnames:
+            sheet = book.get_worksheet_by_name(sheet_name)
+        else:
+            sheet = book.add_worksheet(sheet_name)
+        sheet.active = True
+
+        #chart - need to be able to pass in labels later
+        chart = book.add_chart({'type': 'column'})
+        chart.set_title({'name': 'Views per Month'})
+        chart.set_x_axis({'name': 'Month', 'num_format': 'yyyy-MM', 'date_axis': False})
+        chart.set_y_axis({'name': 'Count', 'major_unit': 1})
+        chart.set_size({ 'width': (10 * a_df.shape[0])})
+        v = xl_col_to_name(1) #B
+        c = xl_col_to_name(0) #A
+        chart.add_series({'values': f'=\'{sheet_name}\'!${v}$2:${v}${a_df.shape[0] + 1}',
+                                'categories': f'==\'{sheet_name}\'!${c}$2:${c}${a_df.shape[0] + 1}',
+                                'name': sheet_name,
+                                'fill': {'color': 'red'},
+                                'border': {'color': 'black'}})
+        sheet.insert_chart(f'{xl_col_to_name(a_df.shape[1] + 1)}1', chart)
 
     def export_sheet(self, book, sheet_name, widths, a_df):
         '''export_sheet'''
@@ -70,6 +104,7 @@ class ExcelBuilder():
         book.remove_timezone = True
         bolded = book.add_format({"bold": True})
         vw_fmt = book.add_format({'num_format': 'yyyy-MM-dd hh:mm AM/PM'})
+        mo_fmt = book.add_format({'num_format': 'yyyy-MM'})
 
         #get sheet by sheet_name
         sheet = None
@@ -77,9 +112,9 @@ class ExcelBuilder():
             sheet = book.get_worksheet_by_name(sheet_name)
         else:
             sheet = book.add_worksheet(sheet_name)
+        sheet.active = True
 
         #sheet settings
-        sheet.active = True
         sheet.set_row(0, None, bolded)
         sheet.add_write_handler(Hyperlink, self.write_hyperlink)
         sheet.add_write_handler(Timestamp, self.write_local_datetime)
@@ -88,8 +123,11 @@ class ExcelBuilder():
             if len(widths) > idx:
                 width = widths[idx]
 
-            if isinstance(a_df.dtypes[col], DatetimeTZDtype):
-                sheet.set_column(idx, idx, width, vw_fmt)
+            if isinstance(a_df.dtypes[col], (DatetimeTZDtype, DateTime64DType)):
+                fmt = vw_fmt
+                if col == 'month':
+                    fmt = mo_fmt
+                sheet.set_column(idx, idx, width, fmt)
             else:
                 sheet.set_column(idx, idx, width)
 
@@ -110,5 +148,7 @@ class ExcelBuilder():
         Convert the timezone aware Timestamps to local timezone
         for Excel and the end user.
         '''
-        local_datetime = ts.astimezone(get_localzone())
+        local_datetime = ts
+        if ts.tzinfo is not None:
+            ts.astimezone(get_localzone())
         return worksheet.write_datetime(row, col, local_datetime)

@@ -17,7 +17,7 @@ from zipfile import ZipFile
 #modules
 from dateutil import tz, parser as dateutil_parser
 from htmlement import parse as html_parse
-from pandas import DataFrame, to_datetime
+from pandas import DataFrame, concat, period_range, to_datetime
 
 @dataclass
 class ViewRecord:
@@ -173,6 +173,8 @@ class WatchHistoryDataHandler():
 
         if len(views) > 0:
             views_df = DataFrame(views)
+            #standardize datetime - more testing needed
+            views_df['view'] = to_datetime(views_df['view'], utc=True)
             log.info('%7d total records processed', idx)
             log.info('%7d ads ignored', idx - views_df.shape[0])
             log.info('%7d views', views_df.shape[0])
@@ -198,6 +200,24 @@ class WatchHistoryDataHandler():
             videos_df, ['channel_id', 'channel_title', 'channel_url'],
             'channel_url', 'videos')
         return channels_df
+
+    def create_monthlyviews_df(self, views_df):
+        '''
+        Create Monthly Views DataFrame from Views DataFrame.
+        '''
+        monthlyviews_df = None
+        #set up the monthly slots (mdf)
+        idx = period_range(views_df['view'].min(), views_df['view'].max(), freq='M')
+        mdf = DataFrame(idx.to_timestamp(), columns=['view'])
+        mdf['count'] = 0
+        #collapse the views data into counts
+        vdf = DataFrame(views_df['view'].dt.to_period("M").dt.to_timestamp(), columns=['view'])
+        vdf['count'] = vdf['view'].map(views_df['view'].dt.to_period("M").dt.to_timestamp().value_counts())
+        #merge the monthly slots and view data counts, keep the highest values
+        monthlyviews_df = concat([vdf, mdf], axis=0).sort_values(['view','count'])
+        monthlyviews_df = monthlyviews_df.drop_duplicates(subset='view', keep='last').reset_index(drop=True)
+        monthlyviews_df = monthlyviews_df.rename(columns={'view': 'month'})
+        return monthlyviews_df
 
     @staticmethod
     def create_count_df(a_df, cols, key, count_name):
