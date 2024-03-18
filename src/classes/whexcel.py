@@ -150,5 +150,5 @@ class ExcelBuilder():
         '''
         local_datetime = ts
         if ts.tzinfo is not None:
-            ts.astimezone(get_localzone())
+            local_datetime = ts.astimezone(get_localzone())
         return worksheet.write_datetime(row, col, local_datetime)
