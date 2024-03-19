@@ -19,6 +19,7 @@ from zipfile import ZipFile
 from dateutil import tz, parser as dateutil_parser
 from htmlement import parse as html_parse
 from pandas import DataFrame, concat, period_range, to_datetime
+from tzlocal import get_localzone
 
 @dataclass
 class ViewRecord:
@@ -145,7 +146,7 @@ class WatchHistoryDataHandler():
         views_df = None
         views = []
         idx = 0
-        last_good_tz = None
+        last_good_tz = get_localzone()
 
         for outer_cell in html_parse(doc, encoding="UTF-8").iterfind(".//div[@class]"):
             if outer_cell.get('class').startswith('outer-cell'):
@@ -161,10 +162,7 @@ class WatchHistoryDataHandler():
                     vw_tz = vw_date.rsplit(' ', 1)[1]
                     if vw_tz is not None and vw_tz in tzinfos:
                         last_good_tz = tzinfos[vw_tz]
-                    if last_good_tz is not None:
-                        print(last_good_tz)
-                        view_date = view_date.replace(tzinfo=last_good_tz)
-                    print(view_date)
+                    view_date = view_date.replace(tzinfo=last_good_tz)
                     #get ids
                     ch_url = channel_alink.get('href')
                     ch_id = ch_url.split("/channel/", 1)[1] if "/channel/" in ch_url else ch_url
