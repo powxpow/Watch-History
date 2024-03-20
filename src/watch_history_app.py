@@ -3,6 +3,7 @@
 import logging
 import os
 import platform
+import subprocess
 import sys
 from pathlib import Path, PurePath
 #modules
@@ -17,6 +18,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QPlainTextEdit,
     QPushButton )
+from PySide6.QtGui import QPalette, QColor
 #classes
 from classes.signalhook import SignalHook
 # pylint: disable=import-error
@@ -132,13 +134,22 @@ class WatchHistoryApp(QMainWindow):
         '''
         open_destination_folder
         '''
-        cmd = 'open'
         match platform.system():
             case 'Windows':
-                cmd = 'explorer'
+                subprocess.Popen(['explorer', Path(self.dest_folder)])
             case 'Linux':
-                cmd = 'xdg-open'
-        os.system(f'{cmd} {Path(self.dest_folder)}', )  #Open folder in default file explorer
+                my_env = dict(os.environ)
+                lp_key = 'LD_LIBRARY_PATH'
+                lp_orig = my_env.get(lp_key + '_ORIG')
+                if lp_orig is not None:
+                    my_env[lp_key] = lp_orig
+                else:
+                    lp = my_env.get(lp_key)
+                    if lp is not None:
+                        my_env.pop(lp_key)
+                subprocess.Popen(["xdg-open", Path(self.dest_folder)], env=my_env)
+            case _:
+                subprocess.Popen(['open', Path(self.dest_folder)])
 
     def run_history_thread(self):
         '''run_history_thread'''
@@ -176,10 +187,9 @@ class WatchHistoryApp(QMainWindow):
         self.source_path_label.setStyleSheet(self.style_path_unset)
 
 if __name__ == "__main__":
-    if platform.system() == 'Windows':
-        sys.argv += ['-platform', 'windows:darkmode=2']
-    app = QApplication(sys.argv)
+    app = QApplication()
     app.setStyle('Fusion')
+    app.setPalette(QPalette(QColor("#323232")))
     window = WatchHistoryApp()
     window.show()
     sys.exit(app.exec())
