@@ -27,12 +27,13 @@ Your data will show up on multiple tabs:
 ## How to Use
 Download the code. Alternatively, you can download the release for Windows or Linux on the right of the screen and unzip it to where you want.
 
-Visit <a href="https://takeout.google.com">Google Takeout</a> and export everything from YouTube.
+Visit <a href="https://takeout.google.com">Google Takeout</a> and export everything from YouTube. I recommend that you switch the YouTube export to use JSON, as that will guarantee that the dates and times are accurate. But even if you don't switch to JSON, the program will do its best to use the local time.
   
-Run the program with your exported data to transform your watch history into an insightful spreadsheet.
+Run the program with your exported data to transform your watch history into an insightful spreadsheet. You can leave the export zipped up if you want to, or you can point the program to the "watch-history.html" or "watch-history.json" file.
 
-Remember: You can do it! Take control of your data and explore your YouTube journey.
+Open the resulting spreadsheet file in the spreadsheet program of your choice.
+
+You can do it! Take control of your data and explore your YouTube journey.
 
 ## Notes From the Author
-
-I was intending to use YouTube's API for the data, but Google [removed the API access](https://developers.google.com/youtube/v3/revision_history#august-11,-2016) to YouTube Watch History in 2016. Therefore, the program processes the Watch History file you can get from Google Takeout instead. The code can process the Takeout ZIP file as well as the "Watch History" JSON and the HTML versions.
+I was intending to use YouTube's API for the data, but Google [removed the API access](https://developers.google.com/youtube/v3/revision_history#august-11,-2016) to YouTube Watch History in 2016. Therefore, the program processes the Watch History file you can get from Google Takeout instead.
