@@ -16,7 +16,7 @@
 See the videos and how many times you watched them. The links are clickable:
   <p align="center"><img src="./docs/spreadsheet-videos.png"></p>
 
-NOTE: In the test sample above, it looks like "Music Artist" is duplicated, but that is because video link is different! One link points to "music.youtube.com" and the other points to "www.youtube.com". So you can count how many times you viewed a video versus listened to it. This is based on real data I have tested.
+NOTE: In the test sample above, it looks like "Music Artist" is duplicated, but that is because video link is different! One link points to <a href="https://music.youtube.com">music.youtube.com</a> and the other points to <a href="https://www.youtube.com">www.youtube.com</a>. So you you get separate counts for how many times you viewed a video versus listened to it.
 
 See your monthly views as a table and a chart:
   <p align="center"><img src="./docs/spreadsheet-monthly.png"></p>
