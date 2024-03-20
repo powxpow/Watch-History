@@ -13,16 +13,16 @@
 **Cross-Platform Compatibility:** Written in Python, the program runs on Windows, Mac, and Linux. The generated spreadsheet can be opened in Excel, LibreOffice, ONLYOFFICE and Gnumeric.
 
 **See Your Data:**
-See the videos and how many times you watched them. The links are clickable:
-  <p align="center"><img src="./docs/spreadsheet-videos.png"></p>
-
-NOTE: In the test sample above, it looks like "Music Artist" is duplicated, but that is because video link is different! One link points to <a href="https://music.youtube.com">music.youtube.com</a> and the other points to <a href="https://www.youtube.com">www.youtube.com</a>. So you you get separate counts for how many times you viewed a video versus listened to it.
+Your data will show up on multiple tabs:
+  <p align="center"><img src="./docs/spreadsheet-tabs.png"></p>
 
 See your monthly views as a table and a chart:
   <p align="center"><img src="./docs/spreadsheet-monthly.png"></p>
 
-Your data will show up on multiple tabs:
-  <p align="center"><img src="./docs/spreadsheet-tabs.png"></p>
+See the videos and how many times you watched them. The links are clickable:
+  <p align="center"><img src="./docs/spreadsheet-videos.png"></p>
+
+NOTE: In the test sample above, it looks like "Music Artist" is duplicated, but that is because video link is different! One link points to <a href="https://music.youtube.com">music.youtube.com</a> and the other points to <a href="https://www.youtube.com">www.youtube.com</a>. So you you get separate counts for how many times you viewed a video versus listened to it.
 
 ## How to Use
 Download the code. Alternatively, you can download the release for Windows or Linux on the right of the screen and unzip it to where you want.
