@@ -22,7 +22,7 @@ See your monthly views as a table and a chart:
 See the videos and how many times you watched them. The links are clickable:
   <p align="center"><img src="./docs/spreadsheet-videos.png"></p>
 
-NOTE: In the test sample above, it looks like "Music Artist" is duplicated, but that is because video link is different! One link points to <a href="https://music.youtube.com">music.youtube.com</a> and the other points to <a href="https://www.youtube.com">www.youtube.com</a>. So you you get separate counts for how many times you viewed a video versus listened to it.
+NOTE: In the test sample above, it looks like "Music Artist" is duplicated, but that is because the video links are different! One link points to <a href="https://music.youtube.com">music.youtube.com</a> and the other points to <a href="https://www.youtube.com">www.youtube.com</a>. So you you get separate counts for how many times you viewed a video versus listened to it.
 
 ## How to Use
 Download the code. Alternatively, you can download the release for Windows or Linux on the right of the screen and unzip it to where you want.
