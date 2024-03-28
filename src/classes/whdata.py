@@ -14,6 +14,7 @@ from json import JSONDecodeError
 import logging as log
 from pathlib import Path
 import re
+import warnings
 from zipfile import ZipFile
 #modules
 from dateutil import tz, parser as dateutil_parser
@@ -212,6 +213,11 @@ class WatchHistoryDataHandler():
         '''
         Create Monthly Views DataFrame from Views DataFrame.
         '''
+        #2024-04: the pandas team is still in discussions on how to make periods timezone aware
+        #Ignore specific UserWarning message, our data/graph gives the general idea to the user
+        warn = 'Converting to PeriodArray/Index representation will drop timezone information.'
+        warnings.filterwarnings('ignore', message=warn, )
+
         monthlyviews_df = None
         #set up the monthly slots (mdf)
         idx = period_range(views_df['view'].min(), views_df['view'].max(), freq='M')
@@ -226,6 +232,9 @@ class WatchHistoryDataHandler():
         monthlyviews_df = monthlyviews_df.drop_duplicates(
             subset='view', keep='last').reset_index(drop=True)
         monthlyviews_df = monthlyviews_df.rename(columns={'view': 'month'})
+        #Reset warnings to defaults
+        warnings.resetwarnings()
+
         return monthlyviews_df
 
     @staticmethod
