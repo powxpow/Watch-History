@@ -24,6 +24,16 @@ See the videos and how many times you watched them. The links are clickable:
 
 NOTE: In the test sample above, it looks like "Music Artist" is duplicated, but that is because the video links are different! One link points to <a href="https://music.youtube.com">music.youtube.com</a> and the other points to <a href="https://www.youtube.com">www.youtube.com</a>. So you you get separate counts for how many times you viewed a video versus listened to it.
 
+## How to build and run from source
+
+This tool is designed for use with Python 3.12. Please ensure that this is the version of python you are using to build.
+
+Use a virtual environment. If you don't know how to set this up, read [this](https://docs.python.org/3/library/venv.html).
+
+Use pip to install the required packages: `pip install -r src/requirements.txt`
+
+Run the app: `python3 src/watch_history_app.py`
+
 ## How to Use
 Download the code. Alternatively, you can download the release for Windows or Linux on the right of the screen and unzip it to where you want.
 
