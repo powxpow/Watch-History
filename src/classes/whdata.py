@@ -126,17 +126,6 @@ class WatchHistoryDataHandler:
 
         return views_df
 
-    #div.outer-cell
-    #   div.mdl-grid
-    #       header-cell: p ("YouTube","YouTube Music", ...)
-    #       content-cell
-    #           0 a=survey, 1 a=ad, 2 a=video
-    #       content-cell - (no data) and class ends with "mdl-typography--text-right"
-    #       content-cell
-    #           b "Products" (followed by "YouTube")
-    #           optional b "Details" followed by "From Google Ads" (ads and surveys)
-    #                       I have encountered an old ad WITHOUT this section
-    #           b "Why is this here?" followed by explanation and 1 a link
     @staticmethod
     def create_views_df_html(doc):
         """
