@@ -1,11 +1,11 @@
-'''
+"""
     Watch History Data Handler: Reads the watch history file and 
     converts it into three DataFrames:
     - Views, which is as close to the original document as possible
     - Videos, which collapses the views into a count
     - Channels, which collapses the videos into a count
     The DataFrames can then be used by other parts of the program.
-'''
+"""
 #core
 from dataclasses import dataclass
 from datetime import datetime
@@ -22,13 +22,14 @@ from htmlement import parse as html_parse
 from pandas import DataFrame, concat, period_range, to_datetime
 from tzlocal import get_localzone
 
+
 @dataclass
 class ViewRecord:
-    '''
+    """
     ViewRecord dataclass to structure the data coming from Google.
     Since Google exports in two formats (JSON and HTML), we want to
     standardize the information we are getting from them.
-    '''
+    """
     channel_title: str
     channel_url: str
     channel_id: str
@@ -37,14 +38,16 @@ class ViewRecord:
     video_id: str
     view: datetime
 
-class WatchHistoryDataHandler():
-    '''
+
+class WatchHistoryDataHandler:
+    """
     WatchHistoryDataHandler
-    '''
+    """
+
     def create_views_df_from_source(self, source_file):
-        '''
+        """
         create_views_df_from_source
-        '''
+        """
         views_df = None
         src = Path(source_file)
 
@@ -81,9 +84,9 @@ class WatchHistoryDataHandler():
 
     @staticmethod
     def create_views_df_json(data):
-        '''
+        """
         create_views_df_json
-        '''
+        """
         views_df = None
         total = len(data)
         views = []
@@ -95,15 +98,15 @@ class WatchHistoryDataHandler():
             if 'url' in channel:
                 #get ids
                 ch_url = channel.get('url')
-                ch_id  = ch_url.split("/channel/", 1)[1] if '/channel/' in ch_url else ch_url
+                ch_id = ch_url.split("/channel/", 1)[1] if '/channel/' in ch_url else ch_url
                 vd_url = rec.get('titleUrl')
-                vd_id = vd_url.split("?v=",1)[1] if '?v=' in vd_url else vd_url
+                vd_id = vd_url.split("?v=", 1)[1] if '?v=' in vd_url else vd_url
 
                 view_record = ViewRecord(
                     channel_title=channel.get('name'),
                     channel_url=ch_url,
                     channel_id=ch_id,
-                    video_title=rec.get('title').replace('Watched ',''),
+                    video_title=rec.get('title').replace('Watched ', ''),
                     video_url=vd_url,
                     video_id=vd_id,
                     view=dateutil_parser.isoparse(rec.pop('time'))
@@ -118,7 +121,7 @@ class WatchHistoryDataHandler():
 
             log.info('%7d total records processed', total)
             log.info('%7d ads ignored, %d were surveys',
-                total - views_df.shape[0], survey_count)
+                     total - views_df.shape[0], survey_count)
             log.info('%7d views', views_df.shape[0])
 
         return views_df
@@ -136,13 +139,13 @@ class WatchHistoryDataHandler():
     #           b "Why is this here?" followed by explanation and 1 a link
     @staticmethod
     def create_views_df_html(doc):
-        '''
+        """
         create_views_df_html
-        '''
+        """
         tzinfos = {"EST": tz.gettz('US/Eastern'),
-            "CST": tz.gettz('US/Central'),
-            "MST": tz.gettz('US/Mountain'),
-            "PST": tz.gettz('US/Pacific')}
+                   "CST": tz.gettz('US/Central'),
+                   "MST": tz.gettz('US/Mountain'),
+                   "PST": tz.gettz('US/Pacific')}
 
         views_df = None
         views = []
@@ -168,7 +171,7 @@ class WatchHistoryDataHandler():
                     ch_url = channel_alink.get('href')
                     ch_id = ch_url.split("/channel/", 1)[1] if "/channel/" in ch_url else ch_url
                     vd_url = video_alink.get('href')
-                    vd_id = vd_url.split("?v=",1)[1] if '?v=' in vd_url else vd_url
+                    vd_id = vd_url.split("?v=", 1)[1] if '?v=' in vd_url else vd_url
 
                     view_record = ViewRecord(
                         channel_title=channel_alink.text,
@@ -189,36 +192,36 @@ class WatchHistoryDataHandler():
         return views_df
 
     def create_videos_df(self, views_df):
-        '''
+        """
         Create Videos DataFrame from Views DataFrame.
-        '''
+        """
         # video_url is more unique than video_id
         # to get the right counts 'music.youtube' needs to be counted separately from 'www.youtube'
         videos_df = self.create_count_df(
             views_df, ['channel_id', 'channel_title', 'channel_url',
-                        'video_id', 'video_title', 'video_url'],
-                        'video_url', 'views')
+                       'video_id', 'video_title', 'video_url'],
+            'video_url', 'views')
         return videos_df
 
     def create_channels_df(self, videos_df):
-        '''
+        """
         Create Channels DataFrame from Videos DataFrame.
-        '''
+        """
         channels_df = self.create_count_df(
             videos_df, ['channel_id', 'channel_title', 'channel_url'],
             'channel_url', 'videos')
         return channels_df
 
-    def create_monthlyviews_df(self, views_df):
-        '''
+    @staticmethod
+    def create_monthlyviews_df(views_df):
+        """
         Create Monthly Views DataFrame from Views DataFrame.
-        '''
+        """
         #2024-04: the pandas team is still in discussions on how to make periods timezone aware
         #Ignore specific UserWarning message, our data/graph gives the general idea to the user
         warn = 'Converting to PeriodArray/Index representation will drop timezone information.'
         warnings.filterwarnings('ignore', message=warn, )
 
-        monthlyviews_df = None
         #set up the monthly slots (mdf)
         idx = period_range(views_df['view'].min(), views_df['view'].max(), freq='M')
         mdf = DataFrame(idx.to_timestamp(), columns=['view'])
@@ -228,7 +231,7 @@ class WatchHistoryDataHandler():
         vdf['count'] = vdf['view'].map(
             views_df['view'].dt.to_period("M").dt.to_timestamp().value_counts())
         #merge the monthly slots and view data counts, keep the highest values
-        monthlyviews_df = concat([vdf, mdf], axis=0).sort_values(['view','count'])
+        monthlyviews_df = concat([vdf, mdf], axis=0).sort_values(['view', 'count'])
         monthlyviews_df = monthlyviews_df.drop_duplicates(
             subset='view', keep='last').reset_index(drop=True)
         monthlyviews_df = monthlyviews_df.rename(columns={'view': 'month'})
@@ -239,14 +242,14 @@ class WatchHistoryDataHandler():
 
     @staticmethod
     def create_count_df(a_df, cols, key, count_name):
-        '''
+        """
         Generic making a DataFrame into one with a count column.
         Grab the included columns, drop duplicates.
-        Then count the key column and and add the count as a count_name.
+        Then count the key column and add the count as a count_name.
         For example: create a "channels" DataFrame, and add the count column
         "videos".
-        '''
-        count_df = DataFrame(a_df,columns=cols).drop_duplicates()
+        """
+        count_df = DataFrame(a_df, columns=cols).drop_duplicates()
         count_df.loc[:, count_name] = count_df.loc[:, key].map(
             a_df[key].value_counts())
         count_df = count_df.sort_values(by=count_name, ascending=False)

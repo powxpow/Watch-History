@@ -1,19 +1,21 @@
-'''Watch History Run: 
+"""Watch History Run:
    Does some handling of the path before calling Watch History Data.
    If creating the Views DataFrame is succesful, it then calls Watch
    History Data to create the other DataFrames (Videos, Channels).
    Finally, if all the data was created properly, it will call the 
-   Spreadsheet Renderer (currently only whexcel) to create the spreadsheet.'''
+   Spreadsheet Renderer (currently only whexcel) to create the spreadsheet."""
 #core
 import logging as log
 from pathlib import Path, PurePath
 #modules
 from pandas import DataFrame
 
+
 class WatchHistoryRun():
-    '''WatchHistoryRun'''
+    """WatchHistoryRun"""
     whdf = None
     spreadsheet = None
+
     def __init__(self, log_handler=None, data_handler=None, spreadsheet=None):
         if log_handler is not None:
             log.getLogger().addHandler(log_handler)
@@ -22,7 +24,7 @@ class WatchHistoryRun():
 
     @staticmethod
     def get_source_path(source_file):
-        '''get_source_path'''
+        """get_source_path"""
         src = None
         spath = source_file
         if isinstance(source_file, str):
@@ -39,7 +41,7 @@ class WatchHistoryRun():
 
     @staticmethod
     def is_good_path(a_path):
-        '''is_good_path'''
+        """is_good_path"""
         is_good = False
         fpath = a_path
         if isinstance(a_path, (str, PurePath)):
@@ -53,9 +55,9 @@ class WatchHistoryRun():
         return is_good
 
     def run(self, source_file, dest_file):
-        '''run'''
+        """run"""
         views_df = None
-        channels_df= None
+        channels_df = None
         videos_df = None
         monthlyviews_df = None
         src = self.get_source_path(source_file)
@@ -71,7 +73,7 @@ class WatchHistoryRun():
                 videos_df = wh.create_videos_df(views_df)
                 log.info('%7d total videos', videos_df.shape[0])
                 log.info('%7d views of already watched videos',
-                    views_df.shape[0] - videos_df.shape[0])
+                         views_df.shape[0] - videos_df.shape[0])
                 log.info('Creating channel records')
                 #channels
                 channels_df = wh.create_channels_df(videos_df)
